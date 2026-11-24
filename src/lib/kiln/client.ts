@@ -1,9 +1,16 @@
 import { previewPathPrefix } from "@/lib/preview-path-prefix";
+import { parseChatBody, streamChat, synthesize, transcribe } from "@/lib/kiln/upstream";
 
 export function apiUrl(path: string): string {
   if (typeof window === "undefined") return path;
   const prefix = previewPathPrefix(window.location.hostname, window.location.pathname);
   return prefix ? `${prefix}${path}` : path;
+}
+
+function onDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  const native = (window as Window & { KilnNative?: { request?: unknown } }).KilnNative;
+  return typeof native?.request === "function";
 }
 
 export type StreamEvent = { d?: string; error?: string; done?: boolean };
@@ -50,12 +57,14 @@ export async function readEventStream(
 }
 
 export async function postChat(body: unknown, signal: AbortSignal, onDelta: (text: string) => void) {
-  const res = await fetch(apiUrl("/api/chat"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-    signal,
-  });
+  const res = onDevice()
+    ? streamChat(parseChatBody(body, window.location.origin), signal)
+    : await fetch(apiUrl("/api/chat"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal,
+      });
   const ctype = res.headers.get("content-type") || "";
   if (!res.ok || ctype.includes("application/json")) {
     const json = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -90,11 +99,14 @@ export function stopSpeech() {
 
 export async function speakText(body: unknown): Promise<void> {
   stopSpeech();
-  const res = await fetch(apiUrl("/api/speak"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const payload = body as { provider: "openai" | "elevenlabs" | "gemini" | "fish"; model: string; voice: string; text: string; apiKey: string };
+  const res = onDevice()
+    ? await synthesize(payload)
+    : await fetch(apiUrl("/api/speak"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
   const ctype = res.headers.get("content-type") || "";
   if (!res.ok || ctype.includes("application/json")) {
     const json = (await res.json().catch(() => null)) as { error?: string } | null;
@@ -129,6 +141,7 @@ export async function transcribeBlob(blob: Blob, provider: string, model: string
   form.set("provider", provider);
   form.set("model", model);
   form.set("apiKey", apiKey);
+  if (onDevice()) return transcribe(form);
   const res = await fetch(apiUrl("/api/transcribe"), { method: "POST", body: form });
   const json = (await res.json().catch(() => null)) as { text?: string; error?: string } | null;
   if (!res.ok || !json?.text) throw new Error(json?.error || "Could not transcribe that recording.");

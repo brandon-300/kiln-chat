@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { asKey, asModel, synthesize } from "@/lib/kiln/upstream.server";
+import { asKey, asModel, synthesize } from "@/lib/kiln/upstream";
 
 export const Route = createFileRoute("/api/speak")({
   server: {
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/api/speak")({
         try {
           const body = (await request.json()) as Record<string, unknown>;
           const provider = body.provider;
-          if (provider !== "openai" && provider !== "elevenlabs" && provider !== "gemini") {
+          if (provider !== "openai" && provider !== "elevenlabs" && provider !== "gemini" && provider !== "fish") {
             throw new Error("Choose a voice model.");
           }
           return await synthesize({

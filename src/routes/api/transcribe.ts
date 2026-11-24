@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { transcribe } from "@/lib/kiln/upstream.server";
+import { transcribe } from "@/lib/kiln/upstream";
 
 export const Route = createFileRoute("/api/transcribe")({
   server: {

@@ -7,6 +7,7 @@ You bring your own API keys. Kiln does not ship a shared key.
 - [Privacy and keys](docs/privacy.md)
 - [Text models](docs/models.md)
 - [Voice](docs/voice.md)
+- [Android install](docs/android.md)
 
 ## Using it
 

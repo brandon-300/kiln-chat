@@ -22,6 +22,7 @@ import {
   TEXT_MODELS,
   ELEVEN_MODELS,
   ELEVEN_VOICES,
+  FISH_TTS_MODELS,
   GEMINI_TTS_MODELS,
   GEMINI_VOICES,
   GROQ_STT_MODELS,
@@ -346,7 +347,9 @@ export function KilnApp() {
         ? { provider: "openai" as const, model: state.voice.openaiTtsModel, voice: state.voice.openaiVoice, keyId: "openai" }
         : choice === "elevenlabs"
           ? { provider: "elevenlabs" as const, model: state.voice.elevenModel, voice: state.voice.elevenVoice, keyId: "elevenlabs" }
-          : { provider: "gemini" as const, model: state.voice.geminiTtsModel, voice: state.voice.geminiVoice, keyId: "google" };
+          : choice === "fish"
+            ? { provider: "fish" as const, model: state.voice.fishModel, voice: state.voice.fishVoice, keyId: "fish" }
+            : { provider: "gemini" as const, model: state.voice.geminiTtsModel, voice: state.voice.geminiVoice, keyId: "google" };
     const apiKey = state.keys[spec.keyId] ?? "";
     if (apiKey.trim().length < 8) {
       setFocusKey(spec.keyId);
@@ -435,7 +438,7 @@ export function KilnApp() {
   }
 
   async function testProvider(id: string) {
-    if (id === "elevenlabs") {
+    if (id === "elevenlabs" || id === "fish") {
       setBanner("Play a reply to check this key.");
       return;
     }
@@ -893,6 +896,7 @@ function VoiceFields({ voice, setVoice }: { voice: VoiceSettings; setVoice: (pat
             ["openai", "OpenAI"],
             ["elevenlabs", "ElevenLabs"],
             ["gemini", "Gemini"],
+            ["fish", "Fish"],
           ] as const
         ).map(([id, label]) => (
           <button
@@ -931,6 +935,21 @@ function VoiceFields({ voice, setVoice }: { voice: VoiceSettings; setVoice: (pat
         <div className="mt-3 flex flex-col gap-2">
           <Select label="Speech model" value={voice.geminiTtsModel} onChange={(geminiTtsModel) => setVoice({ geminiTtsModel })} options={GEMINI_TTS_MODELS.map((m) => ({ value: m.id, label: m.label }))} />
           <Select label="Voice" value={voice.geminiVoice} onChange={(geminiVoice) => setVoice({ geminiVoice })} options={GEMINI_VOICES.map((v) => ({ value: v, label: v }))} />
+        </div>
+      ) : null}
+      {voice.tts === "fish" ? (
+        <div className="mt-3 flex flex-col gap-2">
+          <Select label="Speech model" value={voice.fishModel || "s2.1-pro-free"} onChange={(fishModel) => setVoice({ fishModel })} options={FISH_TTS_MODELS.map((m) => ({ value: m.id, label: m.label }))} />
+          <label className="text-sm">
+            Voice id
+            <input
+              value={voice.fishVoice || ""}
+              spellCheck={false}
+              autoCapitalize="off"
+              onChange={(event) => setVoice({ fishVoice: event.target.value.trim() })}
+              className="mt-1 h-11 w-full rounded-xl border border-line bg-surface px-3 font-mono text-sm outline-none"
+            />
+          </label>
         </div>
       ) : null}
       <label className="mt-3 flex items-center justify-between gap-3 text-base">

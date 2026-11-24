@@ -108,6 +108,14 @@ export const GEMINI_TTS_MODELS = [
   { id: "gemini-3.8-flash-tts", label: "Gemini 3.8 Flash TTS" },
 ];
 
+export const FISH_TTS_MODELS = [
+  { id: "s2.1-pro-free", label: "S2.1 Pro Free" },
+  { id: "s2.1-pro", label: "S2.1 Pro" },
+  { id: "s2-pro", label: "S2 Pro" },
+  { id: "s3-pro", label: "S3 Pro" },
+  { id: "drama-3", label: "Drama 3" },
+];
+
 export const GEMINI_VOICES = ["Kore", "Puck", "Charon", "Zephyr", "Aoede", "Fenrir", "Leda", "Orus"];
 
 export const OPENAI_STT_MODELS = [
@@ -142,5 +150,6 @@ export const KEY_FIELDS: { id: string; label: string; hint: string }[] = [
   { id: "mistral", label: "Mistral", hint: "API key" },
   { id: "openrouter", label: "OpenRouter", hint: "sk-or-…" },
   { id: "elevenlabs", label: "ElevenLabs", hint: "xi-…" },
+  { id: "fish", label: "Fish Audio", hint: "API key" },
   { id: "custom", label: "Custom endpoint", hint: "Bearer token" },
 ];

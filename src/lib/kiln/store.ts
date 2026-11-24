@@ -26,13 +26,15 @@ export type Selection = {
 };
 
 export type VoiceSettings = {
-  tts: "off" | "openai" | "elevenlabs" | "gemini";
+  tts: "off" | "openai" | "elevenlabs" | "gemini" | "fish";
   openaiTtsModel: string;
   openaiVoice: string;
   elevenModel: string;
   elevenVoice: string;
   geminiTtsModel: string;
   geminiVoice: string;
+  fishModel: string;
+  fishVoice: string;
   autoSpeak: boolean;
   stt: "openai" | "groq";
   openaiSttModel: string;
@@ -81,6 +83,8 @@ export const DEFAULT_VOICE: VoiceSettings = {
   elevenVoice: "21m00Tcm4TlvDq8ikWAM",
   geminiTtsModel: "gemini-2.5-flash-preview-tts",
   geminiVoice: "Kore",
+  fishModel: "s2.1-pro-free",
+  fishVoice: "",
   autoSpeak: false,
   stt: "groq",
   openaiSttModel: "gpt-transcribe",
@@ -214,8 +218,12 @@ export const useKiln = create<KilnState>()(
         voice: s.voice,
       }),
       onRehydrateStorage: () => (state) => {
-        useKiln.setState({ hydrated: true });
-        if (state) applyTheme(state.theme);
+        if (state) {
+          useKiln.setState({ hydrated: true, voice: { ...DEFAULT_VOICE, ...state.voice } });
+          applyTheme(state.theme);
+        } else {
+          useKiln.setState({ hydrated: true });
+        }
       },
     },
   ),
