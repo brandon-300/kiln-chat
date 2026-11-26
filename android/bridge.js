@@ -1,4 +1,9 @@
 (function () {
+  if (location.hostname === "appassets.androidplatform.net" && location.pathname !== "/") {
+    try {
+      history.replaceState(null, "", "/");
+    } catch (e) {}
+  }
   if (!window.KilnNative || typeof window.KilnNative.request !== "function") return;
   var jobs = {};
   function b64ToBytes(b64) {

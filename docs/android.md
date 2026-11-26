@@ -6,7 +6,7 @@ The bridge only sends HTTPS requests, refuses private network addresses, and sto
 
 ## Install
 
-1. Download [Kiln.apk](https://github.com/brandon-300/kiln-chat/releases/download/v1.0.0/Kiln.apk).
+1. Download [Kiln.apk](https://github.com/brandon-300/kiln-chat/releases/download/v1.0.1/Kiln.apk).
 2. Open the file in the Files or Downloads app.
 3. If Android asks, allow this install. The build is signed so the phone can update it later with the same signature.
 4. Open Kiln. Paste your own keys in Settings. They stay on the phone.

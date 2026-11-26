@@ -12,6 +12,7 @@ fs.rmSync(root, { recursive: true, force: true });
 fs.mkdirSync(root, { recursive: true });
 const bridge = fs.readFileSync(path.resolve("android/bridge.js"), "utf8");
 let html = fs.readFileSync(htmlPath, "utf8");
+html = html.replace(/<script src="https:\/\/grok\.com\/grok-app-builder\/extensions\.js"[^>]*><\/script>/g, "");
 html = html.replace(/<head([^>]*)>/, `<head$1><script>${bridge}</script>`);
 html = html.replaceAll('src="/favicon.svg"', 'src="favicon.svg"');
 html = html.replaceAll('href="/favicon.svg"', 'href="favicon.svg"');

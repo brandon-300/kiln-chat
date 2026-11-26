@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -76,8 +77,17 @@ class MainActivity : ComponentActivity() {
             }
         }
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest) =
-                loader.shouldInterceptRequest(request.url)
+            override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+                val uri = request.url ?: return null
+                if (uri.scheme != "https" || uri.host != "appassets.androidplatform.net") return null
+                val raw = uri.path ?: "/"
+                val mapped = when {
+                    raw == "/" || raw == "/index.html" -> "/assets/index.html"
+                    raw.startsWith("/assets/") -> raw
+                    else -> "/assets$raw"
+                }
+                return loader.shouldInterceptRequest(uri.buildUpon().path(mapped).build())
+            }
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val url = request.url ?: return true
@@ -94,7 +104,7 @@ class MainActivity : ComponentActivity() {
             }
         })
         if (savedInstanceState == null) {
-            webView.loadUrl("https://appassets.androidplatform.net/assets/index.html")
+            webView.loadUrl("https://appassets.androidplatform.net/")
         } else {
             webView.restoreState(savedInstanceState)
         }
